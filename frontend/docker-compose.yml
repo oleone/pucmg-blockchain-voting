@@ -1,9 +1,16 @@
-version: "3"
+version: "3.3"
+
 services:
- pucng-voting:
-   container_name: pucng-voting
-   image: php:8.0-apache
-   ports:
-     - "8001:80"
-   volumes:
-     - .:/var/www.html
+  pucmg-voting-frontend:
+    container_name: pucmg-voting-frontend
+    build: .
+    image: php:8.0-apache
+    ports:
+      - "80:80"
+    networks:
+      - pucmg-network
+    volumes:
+      - .:/var/www.html
+
+networks:
+  pucmg-network:
