@@ -1,4 +1,4 @@
-pragma solidity 0.7.0;
+pragma solidity 0.8.7;
 
 /// @title Voting with delegation.
 contract Ballot {
@@ -10,6 +10,7 @@ contract Ballot {
         bool voted;  // if true, that person already voted
         address delegate; // person delegated to
         uint vote;   // index of the voted proposal
+        bytes32 name;   // short name (up to 32 bytes)
     }
 
     // This is a type for a single proposal.
@@ -20,6 +21,8 @@ contract Ballot {
 
     address public chairperson;
 
+    bool public isEncerrada;
+
     // This declares a state variable that
     // stores a `Voter` struct for each possible address.
     mapping(address => Voter) public voters;
@@ -27,8 +30,10 @@ contract Ballot {
     // A dynamically-sized array of `Proposal` structs.
     Proposal[] public proposals;
 
+    address[] public eleitores;
+
     /// Create a new ballot to choose one of `proposalNames`.
-    constructor() public {
+    constructor() {
         bytes32[3] memory proposalNames = [bytes32("Flamengo"), bytes32("Palmeiras"), bytes32("Atletico")];
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
@@ -49,7 +54,7 @@ contract Ballot {
 
     // Give `voter` the right to vote on this ballot.
     // May only be called by `chairperson`.
-    function giveRightToVote(address voter) public {
+    function giveRightToVote(address voter, bytes32 name) public {
         // If the first argument of `require` evaluates
         // to `false`, execution terminates and all
         // changes to the state and to Ether balances
@@ -68,8 +73,12 @@ contract Ballot {
             !voters[voter].voted,
             "The voter already voted."
         );
-        require(voters[voter].weight == 0);
+        require(voters[voter].weight == 0, "This voter has already been given the right to vote.");
+
         voters[voter].weight = 1;
+        voters[voter].name = name;
+
+        eleitores.push(voter);
     }
 
     /// Delegate your vote to the voter `to`.
@@ -79,6 +88,8 @@ contract Ballot {
         require(!sender.voted, "You already voted.");
 
         require(to != msg.sender, "Self-delegation is disallowed.");
+
+        require(voters[to].weight >= 1, "You don't have the right to vote.");
 
         // Forward the delegation as long as
         // `to` also delegated.
@@ -114,9 +125,13 @@ contract Ballot {
     /// Give your vote (including votes delegated to you)
     /// to proposal `proposals[proposal].name`.
     function vote(uint proposal) public {
+        require(!isEncerrada, "Votacao encerrada");
+
         Voter storage sender = voters[msg.sender];
+
         require(sender.weight != 0, "Has no right to vote");
         require(!sender.voted, "Already voted.");
+        
         sender.voted = true;
         sender.vote = proposal;
 
@@ -160,5 +175,25 @@ contract Ballot {
     {
         name = proposals[index].name;
         voteCount = proposals[index].voteCount;
+    }
+
+    function getName(address voter) public view
+        returns (bytes32 name)
+    {
+        name = voters[voter].name;
+    }
+
+    function retornaVoters() public view returns (Voter[] memory){
+        Voter[] memory _voters = new Voter[](eleitores.length);
+        for (uint i=0; i < eleitores.length; i++) {
+            address addVoter = eleitores[i];
+            Voter memory voter = voters[addVoter];
+            _voters[i] = voter;
+        }
+        return _voters;
+    }
+
+     function encerrar() public {
+         isEncerrada = true;
     }
 }

@@ -3,19 +3,21 @@ const tableElem = document.getElementById("table-body");
 const candidateOptions = document.getElementById("candidate-options");
 const voteForm = document.getElementById("vote-form");
 
+var votacaoEncerrada;
 var proposals = [];
+var usersVoted = [];
 var myAddress;
+var iAmPresident = false;
 var eleicao;
-const CONTRACT_ADDRESS = "0xf396a27e87ccf377c289b8375c3817046e94133e";
-
+const CONTRACT_ADDRESS = "0xee07cF9bfaA208Bb02efe21888Ff36A0bB23bd42";
 
 const ethEnabled = () => {
 	if (window.ethereum) {
-    		window.web3 = new Web3(window.ethereum);
-    		window.ethereum.enable();
-    		return true;
-  	}
-  	return false;
+		window.web3 = new Web3(window.ethereum);
+		window.ethereum.enable();
+		return true;
+	}
+	return false;
 }
 
 const getMyAccounts = accounts => {
@@ -28,7 +30,7 @@ const getMyAccounts = accounts => {
 				console.log(myAddress + " : " + await window.web3.eth.getBalance(myAddress));
 			});
 		}
-	} catch(error) {
+	} catch (error) {
 		console.log("Erro ao obter contas...");
 	}
 };
@@ -78,7 +80,7 @@ function populaCandidatos(candidatos) {
 
 		// Creates a cell element for the votes.
 		const voteCell = document.createElement("td");
-		voteCell.id = "vote-" + candidato.name; 
+		voteCell.id = "vote-" + candidato.name;
 		voteCell.innerText = candidato.voteCount;
 		rowElem.appendChild(voteCell);
 
@@ -90,21 +92,76 @@ function populaCandidatos(candidatos) {
 		candidateOption.value = index;
 		candidateOption.innerText = candidato.name;
 		candidateOptions.appendChild(candidateOption);
-        });
+	});
+}
+
+function votar() {
+	candidato = $("#candidate-options").children("option:selected").val();
+	eleicao.methods.vote(candidato).send({ from: myAddress })
+		.on('receipt', function (receipt) {
+			console.log("Voto computado");
+			window.location.reload();
+		})
+		.on('error', function (error) {
+			console.log(error.message);
+			return;
+		});
+}
+
+function delegar() {
+	const para = document.getElementById("delegar").value;
+
+	eleicao.methods.delegate(para).send({ from: myAddress })
+		.on('receipt', function (receipt) {
+			console.log("Voto delegado");
+			window.location.reload();
+		})
+		.on('error', function (error) {
+			console.log(error.message);
+			return;
+		});
+}
+
+function homologar() {
+	const endereco = document.getElementById("rede").value;
+	const nome = document.getElementById("eleitor").value;
+	
+	eleicao.methods.giveRightToVote(endereco,nome).send({ from: myAddress })
+		.on('receipt', function (receipt) {
+			console.log("eleitor cadastrado");
+			window.location.reload();
+		})
+		.on('error', function (error) {
+			console.log(error.message);
+			return;
+		});
+}
+
+function encerrar() {
+	
+	eleicao.methods.encerrar().send({ from: myAddress })
+		.on('receipt', function (receipt) {
+			console.log("votacao encerrada");
+			window.location.reload();
+		})
+		.on('error', function (error) {
+			console.log(error.message);
+			return;
+		});
 }
 
 
-$("#btnVote").on('click',function(){
+$("#btnVote").on('click', function () {
 	candidato = $("#candidate-options").children("option:selected").val();
 
-        eleicao.methods.vote(candidato).send({from: myAddress})
-	       .on('receipt',function(receipt) {
+	eleicao.methods.vote(candidato).send({ from: myAddress })
+		.on('receipt', function (receipt) {
 			//getCandidatos(eleicao, populaCandidatos);
 			windows.location.reaload(true);
 		})
-		.on('error',function(error) {
+		.on('error', function (error) {
 			console.log(error.message);
-               		return;     
-        	});  
+			return;
+		});
 
 });
