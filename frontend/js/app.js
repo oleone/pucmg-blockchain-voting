@@ -8,7 +8,7 @@ var usersVoted = [];
 var myAddress;
 var iAmPresident = false;
 var eleicao;
-const CONTRACT_ADDRESS = "0xee07cF9bfaA208Bb02efe21888Ff36A0bB23bd42";
+const CONTRACT_ADDRESS = "0x3DD13C38F8833488c735B6B0930a71699643f05C";
 
 const ethEnabled = () => {
 	if (window.ethereum) {
