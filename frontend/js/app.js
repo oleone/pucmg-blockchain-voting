@@ -1,4 +1,3 @@
-
 const tableElem = document.getElementById("table-body");
 const candidateOptions = document.getElementById("candidate-options");
 const voteForm = document.getElementById("vote-form");
@@ -35,10 +34,10 @@ const getMyAccounts = accounts => {
 	}
 };
 
-window.addEventListener('load', async function() {
+window.addEventListener('load', async function () {
 
 	if (!ethEnabled()) {
-  		alert("Por favor, instale um navegador compatível com Ethereum ou uma extensão como o MetaMask para utilizar esse dApp!");
+		alert("Por favor, instale um navegador compatível com Ethereum ou uma extensão como o MetaMask para utilizar esse dApp!");
 	}
 	else {
 		getMyAccounts(await web3.eth.getAccounts());
@@ -48,18 +47,17 @@ window.addEventListener('load', async function() {
 	}
 });
 
-function getCandidatos(contractRef,callback)
-{
+function getCandidatos(contractRef, callback) {
 	//contractRef.methods.getProposalsCount().call().then((count)=>{
 	contractRef.methods.getProposalsCount().call(async function (error, count) {
-		for (i=0; i<count; i++) {
-			await contractRef.methods.getProposal(i).call().then((data)=>{
+		for (i = 0; i < count; i++) {
+			await contractRef.methods.getProposal(i).call().then((data) => {
 				var proposal = {
-          				name : web3.utils.toUtf8(data[0]),
-          				voteCount : data[1]
-      				};
+					name: web3.utils.toUtf8(data[0]),
+					voteCount: data[1]
+				};
 				proposals.push(proposal);
- 			});
+			});
 		}
 		if (callback) {
 			callback(proposals);
@@ -125,8 +123,8 @@ function delegar() {
 function homologar() {
 	const endereco = document.getElementById("rede").value;
 	const nome = document.getElementById("eleitor").value;
-	
-	eleicao.methods.giveRightToVote(endereco,nome).send({ from: myAddress })
+
+	eleicao.methods.giveRightToVote(endereco, nome).send({ from: myAddress })
 		.on('receipt', function (receipt) {
 			console.log("eleitor cadastrado");
 			window.location.reload();
@@ -138,7 +136,7 @@ function homologar() {
 }
 
 function encerrar() {
-	
+
 	eleicao.methods.encerrar().send({ from: myAddress })
 		.on('receipt', function (receipt) {
 			console.log("votacao encerrada");
