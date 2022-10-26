@@ -1,3 +1,5 @@
+const Web3 = require("web3");
+
 const tableElem = document.getElementById("table-body");
 const candidateOptions = document.getElementById("candidate-options");
 const voteForm = document.getElementById("vote-form");
