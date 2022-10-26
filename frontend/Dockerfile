@@ -10,6 +10,8 @@ COPY ./run-apache2.sh /usr/local/bin/
 
 RUN chown -R www-data:www-data /var/www
 
+RUN grep -r mpm_ /etc/apache2
+
 ENTRYPOINT ["sh", "/usr/local/bin/run-apache2.sh"]
 
 # CMD [ "run-apache2.sh" ]
