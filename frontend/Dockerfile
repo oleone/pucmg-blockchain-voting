@@ -4,6 +4,9 @@ WORKDIR /app
 
 COPY . /var/www/html/
 
-EXPOSE 80
+COPY ./docker/run-apache2.sh /usr/local/bin/
+CMD [ "run-apache2.sh" ]
 
-RUN chown -R www-data:www-data /var/www
+# EXPOSE 80
+
+# RUN chown -R www-data:www-data /var/www
