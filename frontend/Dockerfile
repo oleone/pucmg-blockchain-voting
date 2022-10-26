@@ -10,6 +10,6 @@ COPY ./run-apache2.sh /usr/local/bin/
 
 RUN chown -R www-data:www-data /var/www
 
-ENTRYPOINT ["sh", "/run-apache2.sh"]
+ENTRYPOINT ["sh", "run-apache2.sh"]
 
 # CMD [ "run-apache2.sh" ]
