@@ -2,4 +2,4 @@ build:
   docker:
     web: frontend/Dockerfile
 run:
-  web: bundle exec puma -C config/puma.rb
+  # web: bundle exec puma -C config/puma.rb
