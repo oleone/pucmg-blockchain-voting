@@ -1,17 +1,13 @@
-FROM php:8.0-apache
+FROM node:16
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY . /var/www/html/
+COPY ./package*.json ./
 
-COPY ./run-apache2.sh /usr/local/bin/
+COPY . .
 
-# EXPOSE 80
+RUN npm install
 
-RUN chown -R www-data:www-data /var/www
+EXPOSE 8080
 
-RUN grep -r mpm_ /etc/apache2
-
-ENTRYPOINT ["sh", "/usr/local/bin/run-apache2.sh"]
-
-# CMD [ "run-apache2.sh" ]
+CMD ["node", "server.js"]
