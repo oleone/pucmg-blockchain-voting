@@ -6,7 +6,7 @@ COPY . /var/www/html/
 
 COPY ./run-apache2.sh /usr/local/bin/
 
-EXPOSE 80
+# EXPOSE 80
 
 RUN chown -R www-data:www-data /var/www
 
