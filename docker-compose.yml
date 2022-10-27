@@ -1,16 +1,15 @@
+# Teste
 version: "3.3"
 
 services:
   pucmg-voting-frontend:
     container_name: pucmg-voting-frontend
-    build: .
-    image: php:8.0-apache
+    build: ./dapp
+    image: node:16
     ports:
       - "80:80"
     networks:
       - pucmg-network
-    volumes:
-      - .:/var/www.html
 
 networks:
   pucmg-network:
