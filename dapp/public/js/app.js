@@ -1,14 +1,15 @@
 const tableElem = document.getElementById("table-body");
+const tableVotorsElem = document.getElementById("table-body-votors");
 const candidateOptions = document.getElementById("candidate-options");
-const voteForm = document.getElementById("vote-form");
+const txtVotacao = document.getElementById("txtVotacao");
 
 var votacaoEncerrada;
 var proposals = [];
 var usersVoted = [];
 var myAddress;
-var iAmPresident = false;
+var isEncerrado = false;
 var eleicao;
-const CONTRACT_ADDRESS = "0x3DD13C38F8833488c735B6B0930a71699643f05C";
+const CONTRACT_ADDRESS = "0x7Ba1E83a7AC9acDbAdd95a3892a84ce2CC09aAeC";
 
 const ethEnabled = () => {
 	if (window.ethereum) {
@@ -44,11 +45,12 @@ window.addEventListener('load', async function () {
 
 		eleicao = new web3.eth.Contract(VotingContractInterface, CONTRACT_ADDRESS);
 		getCandidatos(eleicao, populaCandidatos);
+		popularVoters(eleicao);
 	}
 });
 
 function getCandidatos(contractRef, callback) {
-	//contractRef.methods.getProposalsCount().call().then((count)=>{
+
 	contractRef.methods.getProposalsCount().call(async function (error, count) {
 		for (i = 0; i < count; i++) {
 			await contractRef.methods.getProposal(i).call().then((data) => {
@@ -62,7 +64,6 @@ function getCandidatos(contractRef, callback) {
 		if (callback) {
 			callback(proposals);
 		}
-
 	});
 }
 
@@ -93,20 +94,51 @@ function populaCandidatos(candidatos) {
 	});
 }
 
-function votar() {
+function popularVoters() {
+	contractRef.methods.retornaVoters().call(async function (error, voters) {
+		for (i = 0; i < voters.length; i++) {
+			const rowElem = document.createElement("tr");
+
+			const nameCell = document.createElement("td");
+			nameCell.innerText = voters.name;
+			rowElem.appendChild(nameCell);
+
+			const isVote = document.createElement("td");
+			isVote.innerText = voters.voted;
+			rowElem.appendChild(isVote);
+
+			const delegateCount = document.createElement("td");
+			delegateCount.innerText = voters.weight;
+			rowElem.appendChild(delegateCount);
+
+			const vote = document.createElement("td");
+			vote.innerText = voters.vote;
+			rowElem.appendChild(vote);
+
+			const delegate = document.createElement("td");
+			delegate.innerText = voters.delegate;
+			rowElem.appendChild(delegate);
+			tableVotorsElem.appendChild(rowElem);
+		}
+	});
+}
+
+$("#btnVote").on('click', function () {
 	candidato = $("#candidate-options").children("option:selected").val();
+
 	eleicao.methods.vote(candidato).send({ from: myAddress })
 		.on('receipt', function (receipt) {
-			console.log("Voto computado");
-			window.location.reload();
+			//getCandidatos(eleicao, populaCandidatos);
+			windows.location.reaload(true);
 		})
 		.on('error', function (error) {
 			console.log(error.message);
 			return;
 		});
-}
 
-function delegar() {
+});
+
+$("#btnDelegate").on('click', function () {
 	const para = document.getElementById("delegar").value;
 
 	eleicao.methods.delegate(para).send({ from: myAddress })
@@ -118,44 +150,32 @@ function delegar() {
 			console.log(error.message);
 			return;
 		});
-}
 
-function homologar() {
-	const endereco = document.getElementById("rede").value;
-	const nome = document.getElementById("eleitor").value;
+});
 
-	eleicao.methods.giveRightToVote(endereco, nome).send({ from: myAddress })
+$("#btnGiveRightToVote").on('click', function () {
+	const address = document.getElementById("rightToVoteAddress").value;
+	const name = document.rightToVoteName("delegar").value;
+
+	eleicao.methods.giveRightToVote(address, name).send({ from: myAddress })
 		.on('receipt', function (receipt) {
-			console.log("eleitor cadastrado");
-			window.location.reload();
+			console.log("Voto delegado");
 		})
 		.on('error', function (error) {
 			console.log(error.message);
 			return;
 		});
-}
+});
 
-function encerrar() {
-
+$("#btnEncerrar").on('click', function () {
 	eleicao.methods.encerrar().send({ from: myAddress })
 		.on('receipt', function (receipt) {
-			console.log("votacao encerrada");
+			console.log("Votacao encerrada");
+
+			txtVotacao.innerText = "Votação encerrada";
+			document.querySelector('#btnVote').disabled = true;
+
 			window.location.reload();
-		})
-		.on('error', function (error) {
-			console.log(error.message);
-			return;
-		});
-}
-
-
-$("#btnVote").on('click', function () {
-	candidato = $("#candidate-options").children("option:selected").val();
-
-	eleicao.methods.vote(candidato).send({ from: myAddress })
-		.on('receipt', function (receipt) {
-			//getCandidatos(eleicao, populaCandidatos);
-			windows.location.reaload(true);
 		})
 		.on('error', function (error) {
 			console.log(error.message);
