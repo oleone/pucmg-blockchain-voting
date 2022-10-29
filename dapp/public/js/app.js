@@ -45,7 +45,7 @@ window.addEventListener('load', async function () {
 
 		eleicao = new web3.eth.Contract(VotingContractInterface, CONTRACT_ADDRESS);
 		getCandidatos(eleicao, populaCandidatos);
-		popularVoters(eleicao);
+		popularVoters();
 	}
 });
 
@@ -95,7 +95,7 @@ function populaCandidatos(candidatos) {
 }
 
 function popularVoters() {
-	contractRef.methods.retornaVoters().call(async function (error, voters) {
+	eleicao.methods.retornaVoters().call(async function (error, voters) {
 		for (i = 0; i < voters.length; i++) {
 			const rowElem = document.createElement("tr");
 
