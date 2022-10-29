@@ -9,7 +9,7 @@ var usersVoted = [];
 var myAddress;
 var isEncerrado = false;
 var eleicao;
-const CONTRACT_ADDRESS = "0x3DD13C38F8833488c735B6B0930a71699643f05C";
+const CONTRACT_ADDRESS = "0x7Ba1E83a7AC9acDbAdd95a3892a84ce2CC09aAeC";
 
 const ethEnabled = () => {
 	if (window.ethereum) {
